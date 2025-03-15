@@ -6,17 +6,14 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const handleAuth = async () => {
+    const initializeUser = async () => {
       const storedUser = localStorage.getItem('piUser');
-
+      
       if (storedUser) {
-        // Automatically restore the saved user session
         setUser(JSON.parse(storedUser));
         setLoading(false);
       } else {
-        // First-time authentication via Pi SDK
         const authenticatedUser = await authenticateWithPi();
-
         if (authenticatedUser) {
           localStorage.setItem('piUser', JSON.stringify(authenticatedUser));
           setUser(authenticatedUser);
@@ -25,21 +22,35 @@ export default function Home() {
       }
     };
 
-    handleAuth();
+    initializeUser();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <h2>Loading your Pi profile...</h2>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h1>Welcome to My Pi Hire App 🚀</h1>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>🚀 Welcome to Pi Freelance Hub</h1>
       {user ? (
         <div>
-          <p>✅ You're logged in as: <strong>{user.username}</strong></p>
-          {/* Main app content goes here */}
+          <p>✅ <strong>Logged in as:</strong> {user.username}</p>
+          <nav>
+            <ul>
+              <li><a href="/jobs">Browse Jobs</a></li>
+              <li><a href="/profile">My Profile</a></li>
+              <li><a href="/chat">Chat with Freelancers</a></li>
+              <li><a href="/privacy-policy">Privacy Policy</a></li>
+              <li><a href="/terms-of-service">Terms of Service</a></li>
+            </ul>
+          </nav>
         </div>
       ) : (
-        <p>❌ Authentication failed or cancelled.</p>
+        <p>❌ Authentication failed or was cancelled. Please refresh and try again.</p>
       )}
     </div>
   );
