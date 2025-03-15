@@ -1,27 +1,46 @@
-import React from "react";
-import Link from "next/link";
-import { FaSearch } from "react-icons/fa";
+import { useEffect, useState } from 'react';
+import { authenticateWithPi } from '../utils/piAuth';
 
-const Home = () => {
+export default function Home() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const handleAuth = async () => {
+      const storedUser = localStorage.getItem('piUser');
+
+      if (storedUser) {
+        // Automatically restore the saved user session
+        setUser(JSON.parse(storedUser));
+        setLoading(false);
+      } else {
+        // First-time authentication via Pi SDK
+        const authenticatedUser = await authenticateWithPi();
+
+        if (authenticatedUser) {
+          localStorage.setItem('piUser', JSON.stringify(authenticatedUser));
+          setUser(authenticatedUser);
+        }
+        setLoading(false);
+      }
+    };
+
+    handleAuth();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-5xl font-bold text-center text-blue-600">
-          Find Top Freelancers
-        </h1>
-        <div className="flex justify-center mt-6">
-          <input
-            type="text"
-            placeholder="Search for services..."
-            className="w-1/2 p-3 border rounded-lg shadow"
-          />
-          <button className="ml-2 flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-            <FaSearch className="mr-2" /> Search
-          </button>
+    <div>
+      <h1>Welcome to My Pi Hire App 🚀</h1>
+      {user ? (
+        <div>
+          <p>✅ You're logged in as: <strong>{user.username}</strong></p>
+          {/* Main app content goes here */}
         </div>
-      </div>
+      ) : (
+        <p>❌ Authentication failed or cancelled.</p>
+      )}
     </div>
   );
-};
-
-export default Home;
+}
