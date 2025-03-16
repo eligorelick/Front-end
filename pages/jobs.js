@@ -1,29 +1,59 @@
-import React from "react";
-import { FaBriefcase } from "react-icons/fa";
+import { useEffect, useState } from 'react';
+import PiPayment from '../components/PiPayment';
 
-const JobListings = () => {
+export default function Jobs() {
+  const [jobs, setJobs] = useState([]);
+  const [user, setUser] = useState(null);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('piUser');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      fetchJobs(JSON.parse(storedUser));
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchJobs = async (user) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/jobs`, {
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+    const data = await res.json();
+    setJobs(data.jobs);
+    setLoading(false);
+  };
+
+  const handleJobSelect = (job) => {
+    setSelectedJob(job);
+  };
+
+  if (loading) return <p>Loading jobs...</p>;
+
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-3xl font-bold text-gray-800">Available Jobs</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-        {[1, 2, 3].map((job) => (
-          <div
-            key={job}
-            className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition"
-          >
-            <h3 className="text-xl font-semibold text-gray-800">
-              Job Title {job}
-            </h3>
-            <p className="text-gray-600">Job Description for job {job}</p>
-            <p className="text-gray-700 font-bold mt-2">Price: {job * 2} Pi</p>
-            <button className="mt-3 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center">
-              <FaBriefcase className="mr-2" /> Apply & Pay
-            </button>
-          </div>
-        ))}
-      </div>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>🛠️ Available Jobs</h1>
+
+      {selectedJob ? (
+        <div>
+          <h2>{selectedJob.title}</h2>
+          <p>{selectedJob.description}</p>
+          <PiPayment amount={selectedJob.amount} jobId={selectedJob.id} workerId={user.username} />
+          <button onClick={() => setSelectedJob(null)}>Back to jobs list</button>
+        </div>
+      ) : (
+        <ul>
+          {jobs.map(job => (
+            <li key={job.id}>
+              <h3>{job.title}</h3>
+              <p>{job.description}</p>
+              <button onClick={() => handleJobSelect(job)}>Pay & Hire</button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
-
-export default JobListings;
+}

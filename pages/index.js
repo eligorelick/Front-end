@@ -8,7 +8,7 @@ export default function Home() {
   useEffect(() => {
     const initializeUser = async () => {
       const storedUser = localStorage.getItem('piUser');
-      
+
       if (storedUser) {
         setUser(JSON.parse(storedUser));
         setLoading(false);
@@ -41,11 +41,12 @@ export default function Home() {
           <p>✅ <strong>Logged in as:</strong> {user.username}</p>
           <nav>
             <ul>
-              <li><a href="/jobs">Browse Jobs</a></li>
-              <li><a href="/profile">My Profile</a></li>
-              <li><a href="/chat">Chat with Freelancers</a></li>
-              <li><a href="/privacy-policy">Privacy Policy</a></li>
-              <li><a href="/terms-of-service">Terms of Service</a></li>
+              <li><a href="/jobs">🛠️ Browse & Post Jobs</a></li>
+              <li><a href="/profile">👤 My Profile</a></li>
+              <li><a href="/chat">💬 Chat with Freelancers</a></li>
+              <li><a href="/reviews">⭐ View Reviews</a></li>
+              <li><a href="/privacy-policy">📄 Privacy Policy</a></li>
+              <li><a href="/terms-of-service">📃 Terms of Service</a></li>
             </ul>
           </nav>
         </div>
