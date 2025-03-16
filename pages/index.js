@@ -8,7 +8,6 @@ export default function Home() {
   useEffect(() => {
     const initializeUser = async () => {
       const storedUser = localStorage.getItem('piUser');
-
       if (storedUser) {
         setUser(JSON.parse(storedUser));
         setLoading(false);
@@ -24,6 +23,14 @@ export default function Home() {
 
     initializeUser();
   }, []);
+
+  const handleLogin = async () => {
+    const authenticatedUser = await authenticateWithPi();
+    if (authenticatedUser) {
+      localStorage.setItem('piUser', JSON.stringify(authenticatedUser));
+      setUser(authenticatedUser);
+    }
+  };
 
   if (loading) {
     return (
@@ -51,7 +58,7 @@ export default function Home() {
           </nav>
         </div>
       ) : (
-        <p>❌ Authentication failed or was cancelled. Please refresh and try again.</p>
+        <button onClick={handleLogin}>Login with Pi</button>
       )}
     </div>
   );
